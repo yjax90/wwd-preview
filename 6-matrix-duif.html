@@ -1,0 +1,72 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Achtergrond 6</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}html,body{height:100%;background:#000;color:#f2f2f2;font-family:'Work Sans',sans-serif;overflow:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%}
+header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:22px 28px;font:12px 'JetBrains Mono';color:#8e8e8e;z-index:3}
+main{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+h1{font-weight:300;font-size:clamp(28px,5vw,56px);letter-spacing:-.02em;max-width:14em;line-height:1.08}
+p.s{color:#8e8e8e;margin:14px 0 26px;max-width:30em;font-size:15px}
+.k{width:min(460px,100%);background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.12);padding:16px;text-align:left}
+textarea{width:100%;height:84px;background:transparent;border:0;color:#f2f2f2;font:14px 'JetBrains Mono';resize:none;outline:0}
+.r{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font:12px 'JetBrains Mono';color:#8e8e8e}
+button{background:#f2f2f2;color:#000;border:0;padding:10px 18px;font:500 13px 'Work Sans';cursor:pointer}
+.tag{position:fixed;bottom:18px;left:28px;font:11px 'JetBrains Mono';color:#4d4d4d;z-index:3}
+</style></head><body>
+<canvas id="c"></canvas>
+<header><span>Wachtwoordduif</span><span>Inloggen</span></header>
+<main><h1>Deel een wachtwoord dat zichzelf wist</h1>
+<p class="s">Plak het hieronder. Je krijgt een link die één keer werkt. Daarna is het weg.</p>
+<div class="k"><textarea id="t" placeholder="Wachtwoord, code of tekst…" spellcheck="false"></textarea><div class="r"><span>Verdwijnt na 1 dag</span><button id="b">Maak link</button></div></div></main>
+<div class="tag">6 · Matrix in zwart-wit: jouw tekens regenen mee, verzegelen = duif</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),dpr=Math.min(devicePixelRatio||1,2);let W,H;
+let init=null,mx=-999,my=-999,typed=0,sealed=0;
+function rs(){W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);init&&init()}
+addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY});
+document.getElementById('t').addEventListener('input',()=>{typed=1});
+document.getElementById('b').addEventListener('click',()=>{sealed=performance.now()});
+
+const POOL='abcdefghjkmnpqrstuvwxyz23456789';let extra='';
+document.getElementById('t').addEventListener('input',e=>{extra=(e.target.value||'').slice(-40)});
+let S=18,cols,rows,col=[],mask=null,off=document.createElement('canvas');
+function rc(){const p=extra&&Math.random()<.5?extra:POOL;return p[Math.random()*p.length|0]}
+function dove(o,w,h){const k=o.getContext('2d');k.clearRect(0,0,w,h);k.fillStyle='#fff';k.save();k.translate(w/2,h/2);const u=Math.min(w,h)*.5;k.scale(u,u);
+k.beginPath();k.moveTo(-.9,.15);k.bezierCurveTo(-.5,.1,-.35,-.1,-.15,-.55);k.bezierCurveTo(-.05,-.8,.1,-.85,.25,-.7);k.bezierCurveTo(.2,-.45,.12,-.3,.15,-.15);
+k.bezierCurveTo(.35,-.35,.55,-.55,.85,-.6);k.bezierCurveTo(.7,-.35,.55,-.1,.4,.05);k.bezierCurveTo(.5,.1,.65,.1,.8,.05);k.bezierCurveTo(.6,.25,.35,.3,.1,.3);
+k.bezierCurveTo(-.05,.45,-.25,.55,-.45,.62);k.bezierCurveTo(-.4,.4,-.38,.3,-.4,.22);k.bezierCurveTo(-.55,.25,-.75,.25,-.9,.15);k.closePath();k.fill();
+k.beginPath();k.arc(.3,-.7,.01,0,6.3);k.restore()}
+init=()=>{cols=Math.ceil(W/S);rows=Math.ceil(H/S);col=[];for(let i=0;i<cols;i++)col.push({y:Math.random()*rows*1.5-rows*.5,v:.12+Math.random()*.28,L:8+Math.random()*22,ch:Array.from({length:rows+2},rc)});
+off.width=cols;off.height=rows;dove(off,cols,rows);const d=off.getContext('2d').getImageData(0,0,cols,rows).data;mask=new Float32Array(cols*rows);for(let i=0;i<cols*rows;i++)mask[i]=d[i*4+3]>128?1:0}
+const WRD=['W4chtw00rdd|1f','Wachtw00rdduif','w@chtw00rd_duif','\/\/achtw00rdd(1f','Wachtwoordduif'];
+
+const TK='ABCDEFGHJKLMNPQRSTUVWXYZ0123456789',DOEL='Wachtwoordduif';let evt=null,nextEv=1500;
+function startEv(t){const n=DOEL.length;const cx=Math.floor(Math.random()*Math.max(1,cols-n-2))+1;evt={t0:t,c:cx,r0:Math.floor(rows*(.08+Math.random()*.5)),v:.9+Math.random()*.5}}
+function drawEv(t){if(!evt)return;const e=(t-evt.t0)/1000,n=DOEL.length,wacht=.3,per=.09,tot=wacht+n*per,hold=2.2,uit=1.1;
+if(e>tot+hold+uit){evt=null;nextEv=t+5500+Math.random()*5000;return}
+const y=(evt.r0+e*evt.v)*S;x.font='500 15px JetBrains Mono';x.textAlign='center';x.textBaseline='middle';
+for(let i=0;i<n;i++){let ch,al=1;const landed=e>=wacht+i*per;
+if(e<tot+hold){ch=landed?DOEL[i]:TK[Math.random()*TK.length|0].toLowerCase();al=landed?1:.85}
+else{const k=(e-tot-hold)/uit;const gone=k>(i/n)*.8+.2*Math.random();ch=gone?'':(Math.random()<.6?TK[Math.random()*TK.length|0].toLowerCase():DOEL[i]);al=1-k}
+if(!ch)continue;x.fillStyle='rgba(255,255,255,'+Math.max(0,al)+')';x.fillText(ch,(evt.c+i)*S+S/2,y)}}
+function f(t){x.fillStyle='#000';x.fillRect(0,0,W,H);if(!evt&&t>nextEv)startEv(t);x.font='500 14px JetBrains Mono';x.textAlign='center';x.textBaseline='middle';
+const el=sealed?(t-sealed)/1000:-1;
+// fase: 0-1.4 regen+dove aan, 1.4-4.6 houden, 4.6-6.2 vallen
+let m=0,fall=0;if(el>=0){m=Math.min(el/1.6,1);if(el>4.6){fall=Math.min((el-4.6)/1.6,1);m=1}if(el>6.4)sealed=0}
+for(let i=0;i<cols;i++){const c=col[i];c.y+=c.v*(sealed&&el<4.6?.25:1);if(c.y-c.L>rows){c.y=-Math.random()*10;c.v=.12+Math.random()*.28;c.L=8+Math.random()*22;c.w=null;if(false){const W_=WRD[Math.random()*WRD.length|0];c.w=W_;c.y=-W_.length-1;c.v=.1+Math.random()*.06;c.L=W_.length+10}}
+if(Math.random()<.03)c.ch[Math.random()*c.ch.length|0]=rc();
+for(let r=0;r<rows;r++){const d=c.y-r;let a=0;const wch=c.w&&r>=0&&r<c.w.length&&d>=0?c.w[r]:null;if(d>=0&&d<c.L)a=Math.pow(1-d/c.L,1.8)*.3;
+const md=Math.hypot(i*S-mx,r*S-my);let boost=md<110?(1-md/110):0;
+const inm=mask[r*cols+i];let dv=0;
+if(inm&&m>0){const stagger=Math.max(0,Math.min(1,m*1.8-r/rows*.8));dv=stagger*(1-fall)}
+let fx=0,gy=0;if(fall&&inm){gy=fall*fall*H*.6*(.5+((i*7)%5)/5);}
+const outside=sealed&&el<4.6?(1-.7*Math.min(el*2,1)):1;
+let al=Math.min(1,a*outside+boost*.35);if(wch){al=Math.max(al,1-Math.max(0,d-c.w.length)/10)}let v=Math.round(110+40*Math.min(1,a*3));
+if(d>=0&&d<1.2){v=170;a=Math.max(a,.4)}if(wch){v=255;a=Math.max(a,.95)}
+if(dv>0){al=Math.max(al,dv*.9);v=255}
+const cxm=Math.abs(i*S-W/2)/(W*.3),cym=Math.abs(r*S-H/2)/(H*.38);if(!wch&&!dv)al*=.35+.65*Math.min(1,Math.hypot(cxm,cym));if(al<.02)continue;x.fillStyle='rgba('+v+','+v+','+v+','+al+')';
+x.fillText(wch||c.ch[r%c.ch.length],i*S+S/2,r*S+S/2+gy)}}
+drawEv(t);requestAnimationFrame(f)}requestAnimationFrame(f);
+rs();addEventListener('resize',rs);
+</script></body></html>

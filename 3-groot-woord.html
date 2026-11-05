@@ -1,0 +1,41 @@
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex"><title>Achtergrond 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0}html,body{height:100%;background:#000;color:#f2f2f2;font-family:'Work Sans',sans-serif;overflow:hidden}
+canvas{position:fixed;inset:0;width:100%;height:100%}
+header{position:fixed;top:0;left:0;right:0;display:flex;justify-content:space-between;padding:22px 28px;font:12px 'JetBrains Mono';color:#8e8e8e;z-index:3}
+main{position:relative;z-index:2;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+h1{font-weight:300;font-size:clamp(28px,5vw,56px);letter-spacing:-.02em;max-width:14em;line-height:1.08}
+p.s{color:#8e8e8e;margin:14px 0 26px;max-width:30em;font-size:15px}
+.k{width:min(460px,100%);background:rgba(0,0,0,.72);border:1px solid rgba(255,255,255,.12);padding:16px;text-align:left}
+textarea{width:100%;height:84px;background:transparent;border:0;color:#f2f2f2;font:14px 'JetBrains Mono';resize:none;outline:0}
+.r{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font:12px 'JetBrains Mono';color:#8e8e8e}
+button{background:#f2f2f2;color:#000;border:0;padding:10px 18px;font:500 13px 'Work Sans';cursor:pointer}
+.tag{position:fixed;bottom:18px;left:28px;font:11px 'JetBrains Mono';color:#4d4d4d;z-index:3}
+</style></head><body>
+<canvas id="c"></canvas>
+<header><span>Wachtwoordduif</span><span>Inloggen</span></header>
+<main><h1>Deel een wachtwoord dat zichzelf wist</h1>
+<p class="s">Plak het hieronder. Je krijgt een link die één keer werkt. Daarna is het weg.</p>
+<div class="k"><textarea id="t" placeholder="Wachtwoord, code of tekst…" spellcheck="false"></textarea><div class="r"><span>Verdwijnt na 1 dag</span><button id="b">Maak link</button></div></div></main>
+<div class="tag">3 · Gigantische tekst die per teken wegvalt</div>
+<script>
+const c=document.getElementById('c'),x=c.getContext('2d'),dpr=Math.min(devicePixelRatio||1,2);let W,H;
+let init=null,mx=-999,my=-999,typed=0,sealed=0;
+function rs(){W=innerWidth;H=innerHeight;c.width=W*dpr;c.height=H*dpr;x.setTransform(dpr,0,0,dpr,0,0);init&&init()}
+addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY});
+document.getElementById('t').addEventListener('input',()=>{typed=1});
+document.getElementById('b').addEventListener('click',()=>{sealed=performance.now()});
+
+const TXT='Xk9#vT2!qL7@mR4$wZ8&nB5%eY3*';let ch=[];
+init=()=>{ch=[...TXT].map((c,i)=>({c,ph:Math.random()*10,sp:.25+Math.random()*.4}))}
+function f(t){x.clearRect(0,0,W,H);const fs=Math.min(W/6,170);x.font='500 '+fs+'px JetBrains Mono';x.textBaseline='middle';
+const per=Math.floor(W/(fs*.6))+1;
+for(let r=0;r<Math.ceil(H/(fs*1.15))+1;r++)for(let k=0;k<per;k++){const q=ch[(r*per+k)%ch.length];
+const cyc=(t/1000*q.sp+q.ph+r*.7)%10;let a=cyc<2?cyc/2:cyc<6?1:cyc<8?1-(cyc-6)/2:0;
+const drop=cyc>6&&cyc<8?(cyc-6)*fs*.35:0;
+x.fillStyle='rgba(142,142,142,'+(.12*a)+')';x.fillText(q.c,k*fs*.6+fs*.1,r*fs*1.15+fs*.6+drop)}
+requestAnimationFrame(f)}requestAnimationFrame(f);
+rs();addEventListener('resize',rs);
+</script></body></html>
