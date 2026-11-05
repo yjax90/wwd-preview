@@ -19,7 +19,7 @@ button{background:#f2f2f2;color:#000;border:0;padding:10px 18px;font:500 13px 'W
 <main><h1>Deel een wachtwoord dat zichzelf wist</h1>
 <p class="s">Plak het hieronder. Je krijgt een link die één keer werkt. Daarna is het weg.</p>
 <div class="k"><textarea id="t" placeholder="Wachtwoord, code of tekst…" spellcheck="false"></textarea><div class="r"><span>Verdwijnt na 1 dag</span><button id="b">Maak link</button></div></div></main>
-<div class="tag">6 · Stille matrix in donkergrijs: Wachtwoordduif valt af en toe mee als kolom</div>
+<div class="tag">6 · Stille matrix: Wachtwoordduif valt af en toe mee als kolom</div>
 <script>
 const c=document.getElementById('c'),x=c.getContext('2d'),dpr=Math.min(devicePixelRatio||1,2);let W,H;
 let init=null,mx=-999,my=-999,typed=0,sealed=0;
@@ -32,23 +32,23 @@ const POOL='abcdefghjkmnpqrstuvwxyz23456789';
 const WRD=['W4chtw00rdduif','Wachtw00rdd|1f','w@chtwo0rdduif','Wachtwoordd0if','W4chtwoordduif','Wachtwo0rdduif'];
 let S=24,cols,rows,col=[],nextW=1200;
 const rc=()=>POOL[Math.random()*POOL.length|0];
-const sp=()=>.03+Math.random()*.04;
-function mk(spread){return{x:Math.random()*cols|0,y:spread?Math.random()*rows*1.4-rows*.2:-Math.random()*rows*.5,v:sp(),L:8+Math.random()*14,ch:Array.from({length:rows+4},rc),w:null}}
+const dimAt=(px,py)=>.25+.75*Math.min(1,Math.hypot(Math.abs(px-W/2)/(W*.3),Math.abs(py-H/2)/(H*.38)));
+function mk(spread){return{x:Math.random()*cols|0,y:spread?Math.random()*rows*1.4-rows*.2:-Math.random()*rows*.5,v:.03+Math.random()*.04,L:8+Math.random()*14,ch:Array.from({length:rows+4},rc),w:null}}
 init=()=>{cols=Math.ceil(W/S);rows=Math.ceil(H/S);col=[];const n=Math.round(cols*.28);for(let i=0;i<n;i++)col.push(mk(true))}
 function f(t){x.fillStyle='#050505';x.fillRect(0,0,W,H);x.font='500 14px JetBrains Mono';x.textAlign='center';x.textBaseline='middle';
 let hasW=col.some(c=>c.w);
 for(const c of col){c.y+=c.v;
-if(c.y-c.L>rows){const n=mk(false);Object.assign(c,n);if(!hasW&&t>nextW){const w=WRD[Math.random()*WRD.length|0];c.w=w;c.L=w.length+6;c.y=0;c.ch=[...w];hasW=true}}
-if(c.w&&c.y-c.L>rows-1){nextW=t+8000+Math.random()*6000}
-if(Math.random()<.01&&!c.w)c.ch[Math.random()*c.ch.length|0]=rc();
+if(c.y-c.L>rows){if(c.w)nextW=t+8000+Math.random()*6000;Object.assign(c,mk(false));
+ if(!hasW&&t>nextW){const w=WRD[Math.random()*WRD.length|0];c.w=w;c.L=w.length;c.y=-.5;hasW=true}}
+if(c.w)continue;
+if(Math.random()<.01)c.ch[Math.random()*c.ch.length|0]=rc();
 for(let r=0;r<rows;r++){const d=c.y-r;if(d<0||d>=c.L)continue;
-const px=c.x*S,py=r*S;const k=Math.hypot(Math.abs(px-W/2)/(W*.3),Math.abs(py-H/2)/(H*.38));const dim=.25+.75*Math.min(1,k);
-if(c.w){const idx=Math.floor(c.y)-r;if(idx<0||idx>=c.w.length)continue;
-// woord leest van boven naar beneden: eerste letter bovenaan
-const li=c.w.length-1-idx;const a=(.9-.55*(idx/c.w.length))*Math.max(dim,.5);
-x.fillStyle='rgba(255,255,255,'+a+')';x.fillText(c.w[li],px+S/2,py+S/2);continue}
-const a=Math.pow(1-d/c.L,2)*.075*dim;if(a<.004)continue;
-x.fillStyle='rgba(140,140,140,'+a+')';x.fillText(c.ch[r%c.ch.length],px+S/2,py+S/2)}}
+const px=c.x*S,py=r*S;const a=Math.pow(1-d/c.L,1.6)*.2*dimAt(px,py);if(a<.01)continue;
+x.fillStyle='rgba(150,150,150,'+a+')';x.fillText(c.ch[r%c.ch.length],px+S/2,py+S/2)}}
+for(const c of col){if(!c.w)continue;const n=c.w.length,px=c.x*S;
+for(let li=0;li<n;li++){const py=(c.y-(n-1-li))*S;if(py<-S||py>H+S)continue;
+const age=(n-1-li)/n,edge=Math.min(1,Math.max(0,py/(S*3)),Math.max(0,(H-py)/(S*3)));
+x.fillStyle='rgba(255,255,255,'+((.95-.6*age)*Math.max(.5,dimAt(px,py))*edge)+')';x.fillText(c.w[li],px+S/2,py+S/2)}}
 requestAnimationFrame(f)}requestAnimationFrame(f);
 rs();addEventListener('resize',rs);
 </script></body></html>
